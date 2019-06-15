@@ -1,0 +1,16 @@
+{% extends 'src/default_layout.html' %}
+
+{% block page_title %}
+    Contact us
+{% endblock %}
+
+{% block page_content %}
+
+    <h1>Contact us</h1>
+    <ul class="contacts__list-wrapper">
+    {% for i in contacts %}
+        <li class="contacts__list-item">{{i}}</li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}

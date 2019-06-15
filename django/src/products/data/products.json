@@ -1,0 +1,29 @@
+[
+  {
+    "model": "products.Product",
+    "pk": 1,
+    "fields": {
+      "name": "HTML template",
+      "description": "template",
+      "price": "15000"
+    }
+  },
+  {
+    "model": "products.Product",
+    "pk": 2,
+    "fields": {
+      "name": "React template",
+      "description": "template",
+      "price": "25000"
+    }
+  },
+  {
+    "model": "products.Product",
+    "pk": 3,
+    "fields": {
+      "name": "Vue template",
+      "description": "template",
+      "price": "35000"
+    }
+  }
+]

@@ -1,0 +1,34 @@
+{% extends 'src/default_layout.html' %}
+
+{% load static %}
+
+{% block page_static %}
+    <link rel="stylesheet" href="{% static '/products/css/product.css' %}">
+{% endblock %}
+
+{% block page_title %}
+    {{ product_chars.name }}
+{% endblock %}
+
+{% block page_content %}
+
+<div class="product__card">
+    <div class="product__card-wrapper">
+        <div class="product__thumbnail">
+            <div class="image-wrapper">
+                <img src="/media/{{ product_chars.image }}" alt="{{ product_chars.name }}" class="cover-pic">
+            </div>
+        </div>
+        <div class="product__card-title">
+            <h1>{{ product_chars.name }}</h1>
+        </div>
+        <div class="product__card-price">
+            {{ product_chars.price }} ₽
+        </div>
+        <button>
+            Buy {{ product_chars.category }}
+        </button>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'src/default_layout.html' %}
+
+{% load static %}
+
+{% block page_static %}
+    <link rel="stylesheet" href="{% static '/main/css/index.css' %}">
+{% endblock %}
+
+{% block page_title %}
+    Main page
+{% endblock %}
+
+{% block page_content %}
+
+    <h1>Main catalog page</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi asperiores aut, deleniti earum impedit incidunt minima modi molestias perferendis quis rerum veritatis vitae. Eum facilis libero odit porro, quisquam quo.</p>
+    <p>Hello, {{ name }}!</p>
+
+{% endblock %}

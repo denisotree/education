@@ -1,0 +1,17 @@
+{% extends 'src/default_layout.html' %}
+
+{% load static %}
+
+{% block page_static %}
+    <link rel="stylesheet" href="{% static '/products/css/product.css' %}">
+{% endblock %}
+
+{% block page_title %}
+    {{ product_chars.name }}
+{% endblock %}
+
+{% block page_content %}
+
+{% include 'src/form.html' with form=form %}
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'src/default_layout.html' %}
+
+{% load static %}
+
+{% block page_static %}
+    <link rel="stylesheet" href="{% static '/products/css/catalog.css' %}">
+{% endblock %}
+
+{% block page_title %}
+    Catalog
+{% endblock %}
+
+{% block page_content %}
+
+    <h1>Catalog page</h1>
+<div class="catalog__wrapper">
+    <div class="catalog__row">
+        {% for i in object_list %}
+
+        {% include 'src/product.html' with name=i.name slug=i.slug app='products' %}
+
+        {% endfor %}
+    </div>
+    {% include 'src/pagination.html' with page=page_obj page_range=page_obj.paginator.page_range %}
+
+    {% if page_obj.has_next %}
+    <button class="button__show-more">Show More</button>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block page_js %}
+<script src="{% static 'products/js/products.js' %}"></script>
+<script>
+
+    const products = document.querySelector('.catalog__row');
+    const showMoreButton = document.querySelector('.button__show-more');
+
+    let productsUrl = '{% url "rest_products:products" %}?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}';
+
+    console.log(productsUrl);
+
+    const showMore = () => {
+        fetch(productsUrl)
+            .then(response => response.json())
+            .then(
+                data => {
+                    data.results.map(
+                        itm => products.innerHTML += renderProduct(itm)
+                    );
+                    if (data.next_url) {
+                        productsUrl = data.next_url
+                    } else {
+                        showMoreButton.classList.add('hidden')
+                    }
+                }
+            )
+    };
+
+    showMoreButton.addEventListener('click', showMore);
+
+</script>
+{% endblock  %}

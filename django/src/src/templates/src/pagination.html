@@ -1,0 +1,11 @@
+<ul class="pagination">
+        {% if page.has_previous %}
+        <li class="pagination_item-prev"><a href="?page={{ page.previous_page_number }}"><</a></li>
+        {% endif %}
+        {% for num in page_range %}
+            <li class="pagination_item"><a href="?page={{ num }}">{{num}}</a></li>
+        {% endfor %}
+        {% if page.has_next %}
+        <li class="pagination_item-next"><a href="?page={{ page.next_page_number }}">></a></li>
+        {% endif %}
+</ul>

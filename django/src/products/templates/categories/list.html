@@ -1,0 +1,25 @@
+{% extends 'src/default_layout.html' %}
+
+{% load static %}
+
+{% block page_static %}
+    <link rel="stylesheet" href="{% static '/products/css/catalog.css' %}">
+{% endblock %}
+
+{% block page_title %}
+    Categories list
+{% endblock %}
+
+{% block page_content %}
+
+    <h1>Categories list</h1>
+<div class="catalog__wrapper">
+    <div class="catalog__row">
+        {% for category in object_list %}
+            {% include 'src/product.html' with name=category.name slug=category.slug app='categories' %}
+        {% endfor %}
+    </div>
+    {% include 'src/pagination.html' with page=page_obj page_range=page_obj.paginator.page_range %}
+</div>
+
+{% endblock %}

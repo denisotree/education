@@ -1,0 +1,44 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% block page_static %}
+    {% endblock %}
+    <link rel="stylesheet" href="{% static '/src/css/default.css' %}">
+    <title>
+        {% block page_title %}
+        {% endblock %}
+    </title>
+</head>
+<body>
+<header>
+    <div class="header__menu">
+        <ul class="header__menu-wrapper">
+            <li class="header__menu-item"><a href="{% url 'main:main' %}">Main page</a></li>
+            <li class="header__menu-item"><a href="{% url 'products:products' %}">Catalog</a></li>
+            <li class="header__menu-item"><a href="{% url 'categories:list' %}">Categories list</a></li>
+            <li class="header__menu-item"><a href="{% url 'main:about' %}">About us</a></li>
+            <li class="header__menu-item"><a href="{% url 'main:contacts' %}">Contact us</a></li>
+        </ul>
+    </div>
+</header>
+<main>
+
+{% block page_content %}
+{% endblock %}
+
+{% block page_js %}
+{% endblock  %}
+
+</main>
+<footer>
+    <div class="footer__copyright">
+        &#9400; Denis Vdovin
+    </div>
+</footer>
+</body>
+</html>

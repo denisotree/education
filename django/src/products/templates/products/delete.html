@@ -1,0 +1,22 @@
+{% extends 'src/default_layout.html' %}
+
+{% load static %}
+
+{% block page_static %}
+    <link rel="stylesheet" href="{% static '/products/css/product.css' %}">
+{% endblock %}
+
+{% block page_title %}
+    Delete product {{ product.name }}
+{% endblock %}
+
+{% block page_content %}
+
+<form action="" method="post">
+    <span>Вы уверены, что хотите удалить {{ product.name }}?</span>
+    {% csrf_token %}
+    <button type="submit">Да</button>
+    <button type="button">Нет</button>
+</form>
+
+{% endblock %}
