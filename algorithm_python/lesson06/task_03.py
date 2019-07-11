@@ -1,7 +1,7 @@
 from sys import version
 from platform import machine
 import random
-from show_size import show_size
+from .show_size import show_size
 
 arr = [random.randint(1, 100) for _ in range(10)]
 
