@@ -1,6 +1,6 @@
-from .cbr_parser import get_daily_courses
 from datetime import datetime, timedelta
 from pymongo import MongoClient
+from cbr_parser import get_daily_courses
 
 if __name__ == '__main__':
 
