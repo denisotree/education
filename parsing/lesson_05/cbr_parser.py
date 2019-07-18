@@ -2,7 +2,7 @@ from zeep import Client, Settings
 import re
 
 
-def get_daily_courses(date: str):
+def parse_daily_courses(date: str):
     url = 'https://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx?WSDL'
     settings = Settings(force_https=False)
     client = Client(url, settings=settings)
@@ -12,13 +12,10 @@ def get_daily_courses(date: str):
     for val in courses_raw:
         courses.append({
             'code': val['ValuteCursOnDate']['VchCode'],
+            'name': ' '.join(val['ValuteCursOnDate']['Vname'].split()),
+            'num': int(re.sub(r'[^.\d]', '', str(val['ValuteCursOnDate']['Vnom']))),
+            'date': date,
             'value': float(re.sub(r'[^.\d]', '', str(val['ValuteCursOnDate']['Vcurs'])))
         })
-    output = {
-        'date': date,
-        'courses': courses
-    }
+    output = courses
     return output
-
-
-print(get_daily_courses('2019-07-10'))
