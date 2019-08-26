@@ -22,8 +22,6 @@ def get_server_action():
         []
     )
 
-    print(actions)
-
     return actions
 
 
@@ -33,7 +31,5 @@ def resolve(action):
         for item in get_server_action()
         if item
     }
-
-    print(actionmapping)
 
     return actionmapping.get(action)
