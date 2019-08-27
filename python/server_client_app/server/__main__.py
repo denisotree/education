@@ -2,6 +2,7 @@ import yaml
 import json
 from socket import socket
 from argparse import ArgumentParser
+import logging
 
 from resolvers import resolve
 from protocol import validate_request, make_response
@@ -42,6 +43,15 @@ if args.address:
 if args.port:
     config['port'] = args.port
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s — %(message)s',
+    handlers=(
+        logging.FileHandler('server.log'),
+        logging.StreamHandler()
+    )
+)
+
 
 if __name__ == '__main__':
     try:
@@ -49,12 +59,12 @@ if __name__ == '__main__':
         sock.bind((config.get('address'), config.get('port')))
         sock.listen(5)
 
-        print('Server started on localhost with port 8000')
+        logging.info('Server started on localhost with port 8000')
 
         while True:
             client, address = sock.accept()
             client_host, client_port = address
-            print(f'Connect was detected {client_host}:{client_port}')
+            logging.info(f'Connect was detected {client_host}:{client_port}')
 
             bytes_request = client.recv(2048)
 
@@ -68,18 +78,18 @@ if __name__ == '__main__':
                 if controller:
                     try:
                         response = controller(request)
-                        print(f'Client send request {request}')
+                        logging.debug(f'Client send request {request}')
                     except Exception as err:
-                        response = make_response(500)
-                        print(f'Exception — {err}')
+                        response = make_response(request, 500)
+                        logging.critical(f'Exception — {err}')
                 else:
-                    print('Invalid action')
-                    response = make_response(404)
+                    logging.critical('Invalid action')
+                    response = make_response(request, 404)
             else:
-                print('Invalid request')
-                response = make_response(404)
+                logging.critical('Invalid request')
+                response = make_response(request, 404)
 
             client.send(json.dumps(response).encode())
             client.close()
     except KeyboardInterrupt:
-        print('Server turn off')
+        logging.info('Server turn off')
