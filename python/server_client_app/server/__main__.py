@@ -1,11 +1,10 @@
 import yaml
-import json
 from socket import socket
 from argparse import ArgumentParser
 import logging
+from select import select
 
-from resolvers import resolve
-from protocol import validate_request, make_response
+from handlers import handle_tcp_request
 
 config = {
     'address': '127.0.0.1',
@@ -45,7 +44,7 @@ if args.port:
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s — %(message)s',
+    format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=(
         logging.FileHandler('server.log'),
         logging.StreamHandler()
@@ -54,42 +53,39 @@ logging.basicConfig(
 
 
 if __name__ == '__main__':
+
+    connections = []
+    requests = []
+
     try:
         sock = socket()
         sock.bind((config.get('address'), config.get('port')))
+        sock.settimeout(0)
         sock.listen(5)
 
         logging.info('Server started on localhost with port 8000')
 
         while True:
-            client, address = sock.accept()
-            client_host, client_port = address
-            logging.info(f'Connect was detected {client_host}:{client_port}')
+            try:
+                client, address = sock.accept()
+                client_host, client_port = address
+                logging.info(f'Connect was detected {client_host}:{client_port}')
+                connections.append(client)
+            except:
+                pass
 
-            bytes_request = client.recv(2048)
+            rlist, wlist, xlist = select(connections, connections, connections, 0)
 
-            request = json.loads(
-                bytes_request.decode()
-            )
+            for read_client in rlist:
+                bytes_request = read_client.recv(2048)
+                requests.append(bytes_request)
 
-            if validate_request(request):
-                action = request.get('action')
-                controller = resolve(action)
-                if controller:
-                    try:
-                        response = controller(request)
-                        logging.debug(f'Client send request {request}')
-                    except Exception as err:
-                        response = make_response(request, 500)
-                        logging.critical(f'Exception — {err}')
-                else:
-                    logging.critical('Invalid action')
-                    response = make_response(request, 404)
-            else:
-                logging.critical('Invalid request')
-                response = make_response(request, 404)
+            if requests:
+                bytes_request = requests.pop()
+                bytes_response = handle_tcp_request(bytes_request)
 
-            client.send(json.dumps(response).encode())
-            client.close()
+                for write_client in wlist:
+                    write_client.send(bytes_response)
+
     except KeyboardInterrupt:
         logging.info('Server turn off')
