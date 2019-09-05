@@ -2,9 +2,27 @@ import yaml
 from socket import socket
 from argparse import ArgumentParser
 import logging
+import threading
 from select import select
 
 from handlers import handle_tcp_request
+
+
+def read(sock, connections, requests, buffersize=2048):
+    try:
+        bytes_request = sock.recv(buffersize)
+    except Exception:
+        connections.remove(sock)
+    else:
+        requests.append(bytes_request)
+
+
+def write(sock, connections, response):
+    try:
+        sock.send(response)
+    except Exception:
+        connections.remove(sock)
+
 
 config = {
     'address': '127.0.0.1',
@@ -77,15 +95,20 @@ if __name__ == '__main__':
             rlist, wlist, xlist = select(connections, connections, connections, 0)
 
             for read_client in rlist:
-                bytes_request = read_client.recv(2048)
-                requests.append(bytes_request)
+                read_thread = threading.Thread(target=read, daemon=True, args=(
+                    read_client, connections, requests, 2048
+                ))
+                read_thread.start()
 
             if requests:
                 bytes_request = requests.pop()
                 bytes_response = handle_tcp_request(bytes_request)
 
                 for write_client in wlist:
-                    write_client.send(bytes_response)
+                    write_thread = threading.Thread(target=write, args=(
+                        write_client, connections, bytes_response
+                    ))
+                    write_thread.start()
 
     except KeyboardInterrupt:
         logging.info('Server turn off')
