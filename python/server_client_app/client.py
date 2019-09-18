@@ -2,12 +2,10 @@ import yaml
 import json
 import zlib
 import datetime
+import threading
 import hashlib
 from socket import socket
 from argparse import ArgumentParser
-
-READ_MODE = 'read'
-WRITE_MODE = 'write'
 
 config = {
     'address': '127.0.0.1',
@@ -30,11 +28,6 @@ parser.add_argument(
 parser.add_argument(
     '-p', '--port', type=str, required=False,
     help='Sets host port'
-)
-
-parser.add_argument(
-    '-m', '--mode', type=str, required=False, default=READ_MODE,
-    help='Sets client mode'
 )
 
 args = parser.parse_args()
@@ -60,6 +53,13 @@ def make_request(action, data, token=None):
     }
 
 
+def read(sock, buffersize=2048):
+    while True:
+        compressed_response = sock.recv(buffersize)
+        bytes_response = zlib.decompress(compressed_response)
+        print(bytes_response.decode())
+
+
 if __name__ == '__main__':
     try:
         sock = socket()
@@ -67,29 +67,26 @@ if __name__ == '__main__':
 
         print('Client was connected')
 
+        read_thread = threading.Thread(target=read, args=(
+            sock, 2048
+        ))
+        read_thread.start()
+
         while True:
-            if args.mode == WRITE_MODE:
+            action = input('Enter action (echo | date): ')
+            data = input('Enter your message: ')
 
-                action = input('Enter action (echo | date): ')
+            hash_obj = hashlib.sha256()
+            hash_obj.update(
+                str(datetime.datetime.now().timestamp()).encode()
+            )
 
-                data = input('Enter your message: ')
+            request = make_request(action, data, hash_obj.hexdigest())
+            str_request = json.dumps(request)
+            bytes_request = zlib.compress(str_request.encode())
 
-                hash_obj = hashlib.sha256()
-                hash_obj.update(
-                    str(datetime.datetime.now().timestamp()).encode()
-                )
-
-                request = make_request(action, data, hash_obj.hexdigest())
-                str_request = json.dumps(request)
-                bytes_request = zlib.compress(str_request.encode())
-
-                sock.send(bytes_request)
-                print('Client send data')
-
-            else:
-                compressed_response = sock.recv(2048)
-                bytes_response = zlib.decompress(compressed_response)
-                print(bytes_response.decode())
+            sock.send(bytes_request)
+            print('Client send data')
 
     except KeyboardInterrupt:
         print('Client shutdown')
